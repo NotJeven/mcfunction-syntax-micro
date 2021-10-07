@@ -1,0 +1,81 @@
+name: mcfunction
+detect:
+  filename: "\\.mcfunction$"
+
+rules:
+
+    - constant.number: "-?\\d+|\\d*"
+    - constant.number: "^"
+    - constant.number: "~"
+
+    - comment:
+        start: "^\\s*#"
+        end: "$"
+        rules: []
+
+    - name: "[[:alnum:]/.:_-]*"
+    - num: "-?\\d+|\\d*"
+    - coord: "[~^]|[~^]?-?\\d+"
+
+    - symbol.operator: "([=!\\%@]|<|>|/|-|&)"
+    # range
+    - constant.number: "-?\\d+|\\d*\\.\\.-?\\d+|-?\\d+\\.\\."
+    # coordinate
+    - constant.number: "([~^]|[~^]?-?\\d+){2}[~^]|[~^]?-?\\d+"
+    # namespace
+    #- preproc: "([[:alnum:]/.:_-]*):([[:alnum:]/.:_-]*)"
+
+    - constant.string:
+        start: "\""
+        end: "\""
+        skip: "\\\\."
+        rules:
+            - constant.specialChar: "\\\\([\"'abfnrtv\\\\]|[0-3]?[0-7]{1,2}|x[0-9A-Fa-f]{1,2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})"
+
+    - constant.string:
+        start: "'"
+        end: "'"
+        skip: "\\\\."
+        rules:
+            - error: "..+"
+            - constant.specialChar: "\\\\([\"'abfnrtv\\\\]|[0-3]?[0-7]{1,2}|x[0-9A-Fa-f]{1,2}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})"
+
+    # selector
+    - type:
+        start: "@\\w\\["
+        end: "\\]"
+        rules:
+            - preproc: "([[:alnum:]/.:_-]*):([[:alnum:]/.:_-]*)"
+           # - constant.specialChar: "&lt;==([\\w.:_-]+)"
+           # - constant.specialChar: "&lt;==!([\\w.:_-]+)"
+            - error: "(.*)(\\s)(.*)"
+    - type: "@\\w"
+
+    # error
+    - error: "^(\\/)(.*)$"
+
+    # escape
+    - special: "\\."
+
+    # list
+    - statement:
+        start: "\\["
+        end: "\\]"
+        rules:
+            - special: "\\."
+            # nbt
+            - statement:
+                start: "{"
+                end: "}"
+                rules:
+                    - preproc: "([[:alnum:]/.:_-]*):"
+            - contant.number: "\\d+([bls])"
+
+    # types
+    - statement: "\\b(advancement|clear|clone|defaultgamemode|difficulty|effect|data|execute|fill|function|gamemode|gamerule|give|help|kill|list|locate|me|particle|playsound|recipe|reload|replaceitem|say|scoreboard|seed|setblock|setworldspawn|spawnpoint|spreadplayers|stats|stopsound|summon|teleport|tp|tell|msg|w|tellraw|time|title|trigger|weather|worldborder|xp|tag|team|experience|run|item|attribute|ban-ip|ban|banlist|bossbar|datapack|debug|deop|op|enchant|forceload|kick|locatebiome|loot|pardon|publish|save-all|save-off|save-on|schedule|setidletimeout|spectate|stop|teammsg|whitelist)\\b"
+    # keywords
+    - identifier: "\\b(players|objectives|grant|revoke|test|master|music|record|weather|block|hostile|neutral|player|ambient|voice|give|take|entity|AffectedBlocks|AffectedEntities|AffectedItems|QueryResult|SuccessCount|clear|rain|thunder|warning|damage|teams|color|seeFriendlyInvisibles|friendlyfire|nametagVisibility|deathMessageVisibility|collisionRule|sidebar|belowName|daytime|gametime|day|all|filtered|masked|replace|force|move|normal|destroy|hollow|keep|outline|subtitle|actionbar|times|dummy|deathCount|playerKillCount|totalKillCount|health|level|food|air|armor|achievement|stat|craftItem|useItem|breakItem|mineBlock|killEntity|pickup|drop|entityKilledBy|teamkill|killedByTeam|team|result|success|score|eyes|feet|storage|modify|append)\\b"
+    # operator
+    - identifier: "\\b(add|remove|set|operation|reset|query|only|until|from|through|everything|survival|creative|adventure|spectator|peaceful|easy|normal|hard|true|false|if|unless|announceAdvancements|commandBlockOutput|disableElytraMovementCheck|doDaylightCycle|doEntityDrops|doFireTick|doLimitedCrafting|doMobLoot|doMobSpawning|doTileDrops|doWeatherCycle|gameLoopFunction|keepInventory|logAdminCommands|maxCommandChainLength|maxEntityCramming|mobGriefing|naturalRegeneration|randomTickSpeed|reducedDebugInfo|sendCommandFeedback|showDeathMessages|spawnRadius|spectatorsGenerateChunks|EndCity|Fortress|Mansion|Mineshaft|Monument|Stronghold|Temple|Village|option|leave|join|empty|amount|buffer|center|get|distance|merge|entity|block|as|at|positioned|align|facing|rotated|in|anchored|store|blocks|matches|xyz)\\b"
+    # nbt type
+    - type: "\\b(byte|short|int|long|float|double)\\b"
